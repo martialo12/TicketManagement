@@ -2,6 +2,8 @@
 
 REST API for support ticket management, developed with FastAPI, SQLAlchemy, and Pydantic.
 
+🔗 **GitHub Repository**: https://github.com/martialo12/TicketManagement
+
 ## 📋 Description
 
 This API allows you to manage support tickets with the following features:
@@ -27,102 +29,35 @@ This API allows you to manage support tickets with the following features:
 
 - Python 3.10 or higher (3.11.13 recommended)
 - pip (Python package manager)
-- pyenv (optional but recommended for Python version management)
+- **pyenv** (recommended for Python version management)
 
-### Installing Dependencies
+#### Installing pyenv (if not already installed)
 
-#### Option 1: With pyenv (Recommended)
+See official pyenv installation guide: https://github.com/pyenv/pyenv#installation
+
+### Quick Setup
 
 ```bash
-# Clone the repository (if applicable)
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/martialo12/TicketManagement.git
 cd TicketManagement
 
-# Check available Python versions
-pyenv versions
-
-# Create a virtual environment with Python 3.11+
+# Create virtual environment with pyenv (recommended)
 pyenv virtualenv 3.11.13 ticket-management
-
-# Activate the virtual environment
 pyenv activate ticket-management
 
-# Or set the environment locally for the project
-pyenv local ticket-management
-
 # Install dependencies
 pip install -r requirements.txt
-
-# Update pip (optional)
-python -m pip install --upgrade pip
-```
-
-#### Option 2: With standard venv
-
-```bash
-# Clone the repository (if applicable)
-git clone <repository-url>
-cd TicketManagement
-
-# Create a virtual environment
-python -m venv venv
-
-# Activate the virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-# On Windows:
-# venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Setting up Pre-commit Hooks
-
-Pre-commit hooks help maintain code quality by automatically checking your code before each commit.
-
-```bash
-# Install pre-commit hooks (after installing dependencies)
 pre-commit install
-
-# (Optional) Run hooks on all files manually
-pre-commit run --all-files
-```
-
-The pre-commit configuration is in `.pre-commit-config.yaml` and includes:
-- File size checks
-- YAML/TOML validation
-- Ruff linting and formatting
-
-### Installation Verification
-
-```bash
-# Check Python version
-python --version
-# Should display: Python 3.11.13 (or 3.10+)
-
-# Check that packages are installed
-pip list
-
-# Check database configuration (optional)
-python verify_database.py
 ```
 
 ### 🚀 Quick Start
 
-Once the environment is configured, here's how to get started quickly:
-
 ```bash
-# 1. Activate the environment (if not already done)
-pyenv activate ticket-management
-# or
-source venv/bin/activate
+# Run the API
+uvicorn app.main:app --reload --port 8000
 
-# 2. Launch the API
-uvicorn app.main:app --reload
-
-# 3. Open your browser
-# http://localhost:8000/docs
+# Open Swagger UI: http://localhost:8000/docs
 ```
 
 ## 🏃 Running the API
@@ -130,7 +65,7 @@ uvicorn app.main:app --reload
 ### Method 1: Directly with Uvicorn
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8000
 ```
 
 ### Method 2: With Make
@@ -139,14 +74,20 @@ uvicorn app.main:app --reload
 make run
 ```
 
-### Method 3: With Docker
+### Method 3: With Docker Compose (Recommended)
 
 ```bash
-# Build the image
-docker build -t ticket-api .
+# Build and run with Docker Compose
+docker-compose up --build -d
 
-# Run the container
-docker run -p 8000:8000 ticket-api
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
 ```
 
 The API will be accessible at: **http://localhost:8000**
@@ -158,42 +99,17 @@ Once the API is running, interactive documentation is available at:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 🧪 Running Tests
-
-### Execute all tests with coverage
+## 🧪 Testing
 
 ```bash
+# Run tests
+make test
+
+# Or directly
 pytest
 ```
 
-### Execute tests with detailed coverage report
-
-```bash
-pytest --cov=app --cov-report=html --cov-report=term-missing
-```
-
-### With Make
-
-```bash
-make test
-```
-
-The HTML coverage report will be generated in the `htmlcov/` folder.
-
-## 🔍 Linting
-
-To check code quality with Ruff:
-
-```bash
-# Check code
-ruff check .
-
-# Automatically fix errors
-ruff check --fix .
-
-# With Make
-make lint
-```
+Current coverage: **84%** (target: 80%)
 
 ## 📖 Project Structure
 
@@ -202,60 +118,20 @@ The project architecture follows **SOLID principles** and a **clean layered arch
 ```
 TicketManagement/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py           # FastAPI entry point
-│   ├── router.py         # Route/endpoint definitions
-│   ├── dependencies.py   # Dependency injection
-│   ├── services.py       # Business logic layer
-│   ├── repositories.py   # Data access layer
-│   ├── models.py         # SQLAlchemy models
-│   ├── schemas.py        # Pydantic schemas (validation)
-│   ├── exceptions.py     # Custom exceptions
-│   ├── constants.py      # Application constants
-│   └── database.py       # Database configuration
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py       # Test configuration
-│   ├── test_api.py       # Endpoint tests
-│   ├── test_crud.py      # Repository tests
-│   └── test_models.py    # Model tests
-├── requirements.txt      # Python dependencies
-├── pyproject.toml        # Project configuration
-├── Dockerfile            # Docker configuration
-├── Makefile              # Make commands
-├── .gitignore
-└── README.md
+│   ├── core/            # Core components (database, constants)
+│   ├── tickets/         # Ticket module (models, schemas, routes, services, repos)
+│   └── main.py          # FastAPI entry point
+├── tests/               # Test suite
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+└── requirements.txt
 ```
 
-### Layered Architecture
-
-The project is organized into distinct layers for better maintainability and testability:
-
-1. **Router Layer** (`router.py`): Defines HTTP endpoints and request validation
-2. **Service Layer** (`services.py`): Contains business logic
-3. **Repository Layer** (`repositories.py`): Manages data access and CRUD operations
-4. **Models** (`models.py`): Defines database entities
-5. **Schemas** (`schemas.py`): Data validation and serialization with Pydantic
-6. **Dependencies** (`dependencies.py`): Dependency injection to decouple layers
-
-### SOLID Principles Applied
-
-- **S**ingle Responsibility: Each module has a single responsibility (router, service, repository)
-- **O**pen/Closed: Classes are open for extension but closed for modification
-- **L**iskov Substitution: Dependencies are injected via interfaces
-- **I**nterface Segregation: Clear separation between layers via dependency injection
-- **D**ependency Inversion: High-level layers don't depend on low-level layers (dependency injection)
-
-### Best Practices
-
-- ✅ **Structured logging** with Loguru
-- ✅ **Error handling** via custom exceptions
-- ✅ **Strict validation** of data with Pydantic
-- ✅ **Automatic OpenAPI documentation** via FastAPI
-- ✅ **Unit tests** with coverage > 80%
-- ✅ **Python type hints** for better code safety
-- ✅ **Centralized constants** to avoid duplication
-- ✅ **Separation of responsibilities** (Router → Service → Repository → Database)
+**Architecture:** Clean layered architecture with SOLID principles
+- Router → Service → Repository → Database
+- Dependency injection, logging, error handling
+- 84% test coverage
 
 ## 🎯 API Endpoints
 
@@ -301,12 +177,11 @@ Content-Type: application/json
 
 {
   "title": "New title",
-  "description": "New description",
-  "status": "stalled"
+  "description": "New description"
 }
 ```
 
-Possible statuses: `open`, `stalled`, `closed`
+**Note:** Status cannot be updated via this endpoint. Use dedicated endpoints like `PATCH /tickets/{id}/close` to change status.
 
 **Response:** 200 OK or 404 Not Found
 
@@ -332,113 +207,47 @@ DELETE /tickets/{ticket_id}
 
 | Field | Type | Description |
 |-------|------|-------------|
-| id | int | Unique identifier (auto-incremented) |
+| id | UUID | Unique identifier (UUID v4) |
 | title | str | Ticket title |
 | description | str | Detailed description |
 | status | enum | Status: "open", "stalled", "closed" |
 | created_at | datetime | Creation date (UTC) |
 
+**Example ID:** `550e8400-e29b-41d4-a716-446655440000`
+
 ## 🔧 Available Make Commands
 
 ```bash
-make install    # Install dependencies
-make run        # Launch the API
-make test       # Run tests
-make coverage   # Generate coverage report
-make lint       # Check code with Ruff
-make lint-fix   # Automatically fix errors
-make clean      # Clean generated files
-make docker     # Build Docker image
-make help       # Display help
+make help        # Display available commands
+make install     # Install dependencies
+make run         # Run the API locally (port 8000)
+make test        # Run tests with coverage
+make lint        # Check code with Ruff
+make format      # Format and fix code with Ruff
+make clean       # Clean generated files
+make docker-up   # Build and run with Docker Compose
+make docker-down # Stop Docker Compose
 ```
 
-## ⚙️ Configuration
-
-### Database
-
-The API uses an in-memory SQLite database. Data is not persisted after application shutdown.
-
-To use a persistent database, modify the `SQLiteDatabase` initialization in `app/database.py`:
-
-```python
-# Example with SQLite on disk
-db_instance = SQLiteDatabase("sqlite:///./tickets.db")
-```
-
-## 🧪 Test Coverage
-
-The project aims for a minimum **80% coverage**.
-
-To check current coverage:
-
-```bash
-pytest --cov=app --cov-report=term-missing
-```
-
-## 🔗 Git & GitHub Setup
-
-### Initialize Git Repository
-
-```bash
-# Initialize Git repository
-git init
-
-# Add all files
-git add .
-
-# Create first commit
-git commit -m "Initial commit: Ticket Management API with Clean Architecture"
-
-# Set main branch
-git branch -M main
-```
-
-### Push to GitHub
-
-```bash
-# Add remote repository
-git remote add origin git@github.com:martialo12/TicketManagement.git
-
-# Push to GitHub
-git push -u origin main
-```
-
-### Setup Pre-commit Hooks (After Git Init)
-
-```bash
-# Install pre-commit hooks
-pre-commit install
-
-# Run on all files (optional)
-pre-commit run --all-files
-```
 
 ## 🐳 Docker
 
-### Build the image
-
 ```bash
-docker build -t ticket-api .
-```
+# Quick start
+docker-compose up --build -d
 
-### Run the container
-
-```bash
-docker run -p 8000:8000 ticket-api
-```
-
-### With Docker Compose
-
-```bash
-docker-compose up
+# Stop
+docker-compose down
 ```
 
 ## 📝 Notes
 
 - No authentication is required to access the API
-- Data is stored in memory and is lost on restart
+- Data is stored in memory (SQLite) and is lost on restart
 - The API follows REST standards and returns appropriate HTTP codes
 - Data validation is automatic thanks to Pydantic
+- Ticket IDs use UUID v4 for better security and scalability
+- Status changes must use dedicated endpoints (e.g., `/close`)
 
 ## 🤝 Contribution
 
