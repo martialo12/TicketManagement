@@ -15,9 +15,6 @@ from app.tickets.constants import API_DESCRIPTION, API_TITLE, API_VERSION
 from app.tickets.models import Base
 from app.tickets.router import router as ticket_router
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title=API_TITLE,
     description=API_DESCRIPTION,
@@ -28,6 +25,13 @@ app = FastAPI(
 
 # Include routers
 app.include_router(ticket_router)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Create database tables on startup (for development only)."""
+    # Note: In production, use Alembic migrations instead
+    Base.metadata.create_all(bind=engine)
 
 
 @app.get("/", tags=["Root"])

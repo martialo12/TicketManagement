@@ -1,5 +1,7 @@
 """Tests for service layer."""
 
+from uuid import uuid4
+
 import pytest
 
 from app.tickets.exceptions import TicketNotFoundException
@@ -47,8 +49,9 @@ class TestTicketService:
         repository = TicketRepository(db_session)
         service = TicketService(repository)
 
+        non_existent_id = uuid4()
         with pytest.raises(TicketNotFoundException):
-            await service.get_ticket(999)
+            await service.get_ticket(non_existent_id)
 
     @pytest.mark.asyncio
     async def test_get_tickets(self, db_session):
@@ -74,16 +77,14 @@ class TestTicketService:
         ticket_data = TicketCreate(title="Original", description="Original description")
         created = await service.create_ticket(ticket_data)
 
-        # Update it
-        update_data = TicketUpdate(
-            title="Updated", description="Updated description", status=TicketStatus.STALLED
-        )
+        update_data = TicketUpdate(title="Updated", description="Updated description")
         updated = await service.update_ticket(created.id, update_data)
 
         assert updated.id == created.id
         assert updated.title == "Updated"
         assert updated.description == "Updated description"
-        assert updated.status == TicketStatus.STALLED
+        # Status should remain OPEN (not updated)
+        assert updated.status == TicketStatus.OPEN
 
     @pytest.mark.asyncio
     async def test_close_ticket(self, db_session):

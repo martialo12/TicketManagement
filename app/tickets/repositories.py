@@ -4,6 +4,7 @@ Handles database operations for tickets.
 """
 
 from typing import List, Optional
+from uuid import UUID
 
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -55,7 +56,7 @@ class TicketRepository:
             logger.error(f"Error creating ticket: {e}")
             raise TicketCreationFailedException(str(e)) from e
 
-    def get_ticket(self, ticket_id: int) -> Optional[Ticket]:
+    def get_ticket(self, ticket_id: UUID) -> Optional[Ticket]:
         """
         Get a ticket by its ID.
 
@@ -97,7 +98,7 @@ class TicketRepository:
             logger.error(f"Error retrieving tickets: {e}")
             raise
 
-    def update_ticket(self, ticket_id: int, ticket_update: TicketUpdate) -> Ticket:
+    def update_ticket(self, ticket_id: UUID, ticket_update: TicketUpdate) -> Ticket:
         """
         Update an existing ticket.
 
@@ -120,7 +121,7 @@ class TicketRepository:
 
             db_ticket.title = ticket_update.title
             db_ticket.description = ticket_update.description
-            db_ticket.status = ticket_update.status.value
+            # Status is not updated here - use dedicated endpoints like close_ticket()
 
             self.db.commit()
             self.db.refresh(db_ticket)
@@ -133,7 +134,7 @@ class TicketRepository:
             logger.error(f"Error updating ticket {ticket_id}: {e}")
             raise TicketUpdateFailedException(ticket_id, str(e)) from e
 
-    def close_ticket(self, ticket_id: int) -> Ticket:
+    def close_ticket(self, ticket_id: UUID) -> Ticket:
         """
         Close a ticket by setting its status to CLOSED.
 
@@ -165,7 +166,7 @@ class TicketRepository:
             logger.error(f"Error closing ticket {ticket_id}: {e}")
             raise TicketUpdateFailedException(ticket_id, str(e)) from e
 
-    def delete_ticket(self, ticket_id: int) -> None:
+    def delete_ticket(self, ticket_id: UUID) -> None:
         """
         Delete a ticket from the database.
 

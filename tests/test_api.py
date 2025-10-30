@@ -1,5 +1,7 @@
 """Tests for API endpoints."""
 
+from uuid import uuid4
+
 from fastapi import status
 
 from app.tickets.models import TicketStatus
@@ -127,9 +129,10 @@ class TestGetTicket:
 
     def test_get_ticket_not_found(self, client):
         """Test getting a non-existent ticket returns 404."""
-        response = client.get("/tickets/999")
+        non_existent_id = uuid4()
+        response = client.get(f"/tickets/{non_existent_id}")
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert "non trouvé" in response.json()["detail"]
+        assert "not found" in response.json()["detail"]
 
 
 class TestUpdateTicket:
@@ -142,11 +145,10 @@ class TestUpdateTicket:
         create_response = client.post("/tickets/", json=ticket_data)
         ticket_id = create_response.json()["id"]
 
-        # Update the ticket
+        # Update the ticket (only title and description)
         update_data = {
             "title": "Updated Title",
             "description": "Updated Description",
-            "status": TicketStatus.STALLED.value,
         }
         response = client.put(f"/tickets/{ticket_id}", json=update_data)
         assert response.status_code == status.HTTP_200_OK
@@ -154,33 +156,34 @@ class TestUpdateTicket:
         data = response.json()
         assert data["title"] == update_data["title"]
         assert data["description"] == update_data["description"]
-        assert data["status"] == update_data["status"]
+        # Status should remain OPEN (not updated)
+        assert data["status"] == TicketStatus.OPEN.value
 
     def test_update_ticket_not_found(self, client):
         """Test updating a non-existent ticket returns 404."""
+        non_existent_id = uuid4()
         update_data = {
             "title": "Updated Title",
             "description": "Updated Description",
-            "status": TicketStatus.OPEN.value,
         }
-        response = client.put("/tickets/999", json=update_data)
+        response = client.put(f"/tickets/{non_existent_id}", json=update_data)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_update_ticket_invalid_status(self, client):
-        """Test updating with invalid status returns 422."""
+    def test_update_ticket_title_only(self, client):
+        """Test updating only the title."""
         # Create a ticket first
         ticket_data = {"title": "Test Ticket", "description": "Test Description"}
         create_response = client.post("/tickets/", json=ticket_data)
         ticket_id = create_response.json()["id"]
 
-        # Try to update with invalid status
+        # Update only title
         update_data = {
             "title": "Updated Title",
-            "description": "Updated Description",
-            "status": "invalid_status",
+            "description": "Test Description",  # Keep same description
         }
         response = client.put(f"/tickets/{ticket_id}", json=update_data)
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["title"] == "Updated Title"
 
 
 class TestCloseTicket:
@@ -204,7 +207,8 @@ class TestCloseTicket:
 
     def test_close_ticket_not_found(self, client):
         """Test closing a non-existent ticket returns 404."""
-        response = client.patch("/tickets/999/close")
+        non_existent_id = uuid4()
+        response = client.patch(f"/tickets/{non_existent_id}/close")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_close_already_closed_ticket(self, client):
@@ -243,15 +247,15 @@ class TestTicketWorkflow:
         get_response = client.get(f"/tickets/{ticket_id}")
         assert get_response.status_code == status.HTTP_200_OK
 
-        # 4. Update the ticket to stalled
+        # 4. Update the ticket (title and description only - status via dedicated endpoint)
         update_data = {
             "title": "Updated Bug Report",
             "description": "Updated description",
-            "status": TicketStatus.STALLED.value,
         }
         update_response = client.put(f"/tickets/{ticket_id}", json=update_data)
         assert update_response.status_code == status.HTTP_200_OK
-        assert update_response.json()["status"] == TicketStatus.STALLED.value
+        assert update_response.json()["title"] == "Updated Bug Report"
+        assert update_response.json()["status"] == TicketStatus.OPEN.value  # Status unchanged
 
         # 5. Close the ticket
         close_response = client.patch(f"/tickets/{ticket_id}/close")

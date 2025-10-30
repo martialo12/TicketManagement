@@ -4,6 +4,7 @@ Handles business logic for tickets.
 """
 
 from typing import List
+from uuid import UUID
 
 from loguru import logger
 
@@ -42,7 +43,7 @@ class TicketService:
         logger.info(f"Service: Ticket created successfully with ID {ticket.id}")
         return TicketResponse.model_validate(ticket)
 
-    async def get_ticket(self, ticket_id: int) -> TicketResponse:
+    async def get_ticket(self, ticket_id: UUID) -> TicketResponse:
         """
         Get a ticket by its ID.
 
@@ -76,7 +77,7 @@ class TicketService:
         tickets = self.repository.get_tickets(skip=skip, limit=limit)
         return [TicketResponse.model_validate(ticket) for ticket in tickets]
 
-    async def update_ticket(self, ticket_id: int, ticket_data: TicketUpdate) -> TicketResponse:
+    async def update_ticket(self, ticket_id: UUID, ticket_data: TicketUpdate) -> TicketResponse:
         """
         Update an existing ticket.
 
@@ -96,7 +97,7 @@ class TicketService:
         logger.info(f"Service: Ticket {ticket_id} updated successfully")
         return TicketResponse.model_validate(ticket)
 
-    async def close_ticket(self, ticket_id: int) -> TicketResponse:
+    async def close_ticket(self, ticket_id: UUID) -> TicketResponse:
         """
         Close a ticket by setting its status to CLOSED.
 
@@ -115,7 +116,7 @@ class TicketService:
         logger.info(f"Service: Ticket {ticket_id} closed successfully")
         return TicketResponse.model_validate(ticket)
 
-    async def delete_ticket(self, ticket_id: int) -> None:
+    async def delete_ticket(self, ticket_id: UUID) -> None:
         """
         Delete a ticket.
 

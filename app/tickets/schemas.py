@@ -1,6 +1,7 @@
 """Pydantic schemas for request/response validation."""
 
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,7 +9,6 @@ from app.tickets.constants import (
     EXAMPLE_CREATED_AT,
     EXAMPLE_DESCRIPTION,
     EXAMPLE_STATUS_OPEN,
-    EXAMPLE_STATUS_STALLED,
     EXAMPLE_TICKET_ID,
     EXAMPLE_TITLE,
     TICKET_CREATED_AT_DESC,
@@ -42,17 +42,19 @@ class TicketCreate(TicketBase):
 
 
 class TicketUpdate(TicketBase):
-    """Schema for updating an existing ticket."""
+    """Schema for updating an existing ticket.
 
-    status: TicketStatus = Field(
-        ..., description=TICKET_STATUS_DESC, example=EXAMPLE_STATUS_STALLED
-    )
+    Note: Status cannot be updated via this endpoint.
+    Use dedicated endpoints like PATCH /tickets/{id}/close to change status.
+    """
+
+    pass
 
 
 class TicketResponse(TicketBase):
     """Schema for ticket response."""
 
-    id: int = Field(..., description=TICKET_ID_DESC, example=EXAMPLE_TICKET_ID)
+    id: UUID = Field(..., description=TICKET_ID_DESC, example=EXAMPLE_TICKET_ID)
     status: TicketStatus = Field(..., description=TICKET_STATUS_DESC, example=EXAMPLE_STATUS_OPEN)
     created_at: datetime = Field(
         ..., description=TICKET_CREATED_AT_DESC, example=EXAMPLE_CREATED_AT

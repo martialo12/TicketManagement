@@ -1,6 +1,7 @@
 """API router for ticket endpoints."""
 
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, Path, Query, status
 from loguru import logger
@@ -24,7 +25,7 @@ router = APIRouter(prefix="/tickets", tags=["Tickets"])
             "content": {
                 "application/json": {
                     "example": {
-                        "id": 1,
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
                         "title": "Application bug",
                         "description": "Application crashes on startup",
                         "status": "open",
@@ -91,13 +92,17 @@ async def list_tickets(
         404: {
             "description": "Ticket not found",
             "content": {
-                "application/json": {"example": {"detail": "Ticket with ID 999 not found"}}
+                "application/json": {
+                    "example": {
+                        "detail": "Ticket with ID 550e8400-e29b-41d4-a716-446655440000 not found"
+                    }
+                }
             },
         },
     },
 )
 async def get_ticket(
-    ticket_id: int = Path(..., description=TICKET_ID_PATH_DESC, gt=0),
+    ticket_id: UUID = Path(..., description=TICKET_ID_PATH_DESC),
     ticket_service: TicketService = Depends(get_ticket_service),
 ):
     """
@@ -121,32 +126,36 @@ async def get_ticket(
         404: {
             "description": "Ticket not found",
             "content": {
-                "application/json": {"example": {"detail": "Ticket with ID 999 not found"}}
+                "application/json": {
+                    "example": {
+                        "detail": "Ticket with ID 550e8400-e29b-41d4-a716-446655440000 not found"
+                    }
+                }
             },
         },
         422: {"description": "Validation error"},
     },
 )
 async def update_ticket(
-    ticket_id: int = Path(..., description=TICKET_ID_PATH_DESC, gt=0),
+    ticket_id: UUID = Path(..., description=TICKET_ID_PATH_DESC),
     ticket_data: TicketUpdate = Body(
         ...,
-        description="Updated ticket data",
+        description="Updated ticket data (title and description only)",
         example={
             "title": "Bug fixed",
             "description": "The bug has been fixed",
-            "status": "closed",
         },
     ),
     ticket_service: TicketService = Depends(get_ticket_service),
 ):
     """
-    Update all information of an existing ticket.
+    Update ticket information (title and description).
 
     - **ticket_id**: Ticket ID to update
     - **title**: New ticket title
     - **description**: New ticket description
-    - **status**: New ticket status (open, stalled, closed)
+
+    Note: To change ticket status, use dedicated endpoints like PATCH /tickets/{id}/close.
 
     Returns a 404 error if the ticket does not exist.
     """
@@ -165,13 +174,17 @@ async def update_ticket(
         404: {
             "description": "Ticket not found",
             "content": {
-                "application/json": {"example": {"detail": "Ticket with ID 999 not found"}}
+                "application/json": {
+                    "example": {
+                        "detail": "Ticket with ID 550e8400-e29b-41d4-a716-446655440000 not found"
+                    }
+                }
             },
         },
     },
 )
 async def close_ticket(
-    ticket_id: int = Path(..., description=TICKET_ID_PATH_DESC, gt=0),
+    ticket_id: UUID = Path(..., description=TICKET_ID_PATH_DESC),
     ticket_service: TicketService = Depends(get_ticket_service),
 ):
     """
@@ -196,13 +209,17 @@ async def close_ticket(
         404: {
             "description": "Ticket not found",
             "content": {
-                "application/json": {"example": {"detail": "Ticket with ID 999 not found"}}
+                "application/json": {
+                    "example": {
+                        "detail": "Ticket with ID 550e8400-e29b-41d4-a716-446655440000 not found"
+                    }
+                }
             },
         },
     },
 )
 async def delete_ticket(
-    ticket_id: int = Path(..., description=TICKET_ID_PATH_DESC, gt=0),
+    ticket_id: UUID = Path(..., description=TICKET_ID_PATH_DESC),
     ticket_service: TicketService = Depends(get_ticket_service),
 ):
     """

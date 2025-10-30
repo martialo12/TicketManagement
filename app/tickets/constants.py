@@ -22,7 +22,7 @@ TICKET_NOT_FOUND = "Ticket not found"
 DATABASE_OPERATION_FAILED = "Database operation failed"
 
 # Example values
-EXAMPLE_TICKET_ID = 1
+EXAMPLE_TICKET_ID = "550e8400-e29b-41d4-a716-446655440000"
 EXAMPLE_TITLE = "Application bug"
 EXAMPLE_DESCRIPTION = "Application crashes on startup"
 EXAMPLE_STATUS_OPEN = "open"
