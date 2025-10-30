@@ -53,8 +53,7 @@ class TicketRepository:
         except Exception as e:
             self.db.rollback()
             logger.error(f"Error creating ticket: {e}")
-            raise TicketCreationFailedException(str(e))
-
+            raise TicketCreationFailedException(str(e)) from e
 
     def get_ticket(self, ticket_id: int) -> Optional[Ticket]:
         """
@@ -78,7 +77,6 @@ class TicketRepository:
             logger.error(f"Error retrieving ticket {ticket_id}: {e}")
             raise
 
-
     def get_tickets(self, skip: int = 0, limit: int = 100) -> List[Ticket]:
         """
         Get all tickets with pagination.
@@ -98,7 +96,6 @@ class TicketRepository:
         except Exception as e:
             logger.error(f"Error retrieving tickets: {e}")
             raise
-
 
     def update_ticket(self, ticket_id: int, ticket_update: TicketUpdate) -> Ticket:
         """
@@ -134,8 +131,7 @@ class TicketRepository:
         except Exception as e:
             self.db.rollback()
             logger.error(f"Error updating ticket {ticket_id}: {e}")
-            raise TicketUpdateFailedException(ticket_id, str(e))
-
+            raise TicketUpdateFailedException(ticket_id, str(e)) from e
 
     def close_ticket(self, ticket_id: int) -> Ticket:
         """
@@ -167,7 +163,7 @@ class TicketRepository:
         except Exception as e:
             self.db.rollback()
             logger.error(f"Error closing ticket {ticket_id}: {e}")
-            raise TicketUpdateFailedException(ticket_id, str(e))
+            raise TicketUpdateFailedException(ticket_id, str(e)) from e
 
     def delete_ticket(self, ticket_id: int) -> None:
         """
@@ -194,4 +190,4 @@ class TicketRepository:
         except Exception as e:
             self.db.rollback()
             logger.error(f"Error deleting ticket {ticket_id}: {e}")
-            raise TicketDeletionFailedException(ticket_id, str(e))
+            raise TicketDeletionFailedException(ticket_id, str(e)) from e

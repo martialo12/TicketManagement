@@ -68,9 +68,7 @@ async def create_ticket(
 )
 async def list_tickets(
     skip: int = Query(0, ge=0, description="Number of tickets to skip (pagination)"),
-    limit: int = Query(
-        100, ge=1, le=1000, description="Maximum number of tickets to return"
-    ),
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of tickets to return"),
     ticket_service: TicketService = Depends(get_ticket_service),
 ):
     """

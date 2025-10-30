@@ -1,7 +1,5 @@
 """Tests for repository operations."""
 
-import pytest
-
 from app.tickets.models import TicketStatus
 from app.tickets.repositories import TicketRepository
 from app.tickets.schemas import TicketCreate, TicketUpdate
@@ -13,7 +11,9 @@ class TestCreateTicket:
     def test_create_ticket(self, db_session):
         """Test creating a ticket via repository."""
         repository = TicketRepository(db_session)
-        ticket_data = TicketCreate(title="Repository Test", description="Testing repository operations")
+        ticket_data = TicketCreate(
+            title="Repository Test", description="Testing repository operations"
+        )
         ticket = repository.create_ticket(ticket_data)
 
         assert ticket.id is not None
@@ -117,7 +117,7 @@ class TestUpdateTicket:
         )
         try:
             repository.update_ticket(999, update_data)
-            assert False, "Should have raised TicketNotFoundException"
+            raise AssertionError("Should have raised TicketNotFoundException")
         except Exception:
             pass  # Expected
 
@@ -144,7 +144,7 @@ class TestCloseTicket:
         repository = TicketRepository(db_session)
         try:
             repository.close_ticket(999)
-            assert False, "Should have raised TicketNotFoundException"
+            raise AssertionError("Should have raised TicketNotFoundException")
         except Exception:
             pass  # Expected
 

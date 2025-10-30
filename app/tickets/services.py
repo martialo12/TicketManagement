@@ -76,9 +76,7 @@ class TicketService:
         tickets = self.repository.get_tickets(skip=skip, limit=limit)
         return [TicketResponse.model_validate(ticket) for ticket in tickets]
 
-    async def update_ticket(
-        self, ticket_id: int, ticket_data: TicketUpdate
-    ) -> TicketResponse:
+    async def update_ticket(self, ticket_id: int, ticket_data: TicketUpdate) -> TicketResponse:
         """
         Update an existing ticket.
 

@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.tickets.constants import (
     EXAMPLE_CREATED_AT,
     EXAMPLE_DESCRIPTION,
-    EXAMPLE_STATUS_CLOSED,
     EXAMPLE_STATUS_OPEN,
     EXAMPLE_STATUS_STALLED,
     EXAMPLE_TICKET_ID,
@@ -54,9 +53,7 @@ class TicketResponse(TicketBase):
     """Schema for ticket response."""
 
     id: int = Field(..., description=TICKET_ID_DESC, example=EXAMPLE_TICKET_ID)
-    status: TicketStatus = Field(
-        ..., description=TICKET_STATUS_DESC, example=EXAMPLE_STATUS_OPEN
-    )
+    status: TicketStatus = Field(..., description=TICKET_STATUS_DESC, example=EXAMPLE_STATUS_OPEN)
     created_at: datetime = Field(
         ..., description=TICKET_CREATED_AT_DESC, example=EXAMPLE_CREATED_AT
     )

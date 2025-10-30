@@ -101,7 +101,7 @@ engine = db_instance.engine
 
 def get_db() -> Generator[Session, None, None]:
     """Dependency to get database session.
-    
+
     This is used by FastAPI's dependency injection system.
     It ensures proper session lifecycle management.
     """
@@ -114,7 +114,7 @@ def get_db() -> Generator[Session, None, None]:
 
 def get_database_instance() -> Database:
     """Get the singleton database instance.
-    
+
     Returns:
         The global database instance
     """

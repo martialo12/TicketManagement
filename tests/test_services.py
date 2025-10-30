@@ -18,9 +18,7 @@ class TestTicketService:
         repository = TicketRepository(db_session)
         service = TicketService(repository)
 
-        ticket_data = TicketCreate(
-            title="Service Test", description="Testing service layer"
-        )
+        ticket_data = TicketCreate(title="Service Test", description="Testing service layer")
         ticket = await service.create_ticket(ticket_data)
 
         assert ticket.id is not None
@@ -60,9 +58,7 @@ class TestTicketService:
 
         # Create multiple tickets
         for i in range(3):
-            ticket_data = TicketCreate(
-                title=f"Ticket {i}", description=f"Description {i}"
-            )
+            ticket_data = TicketCreate(title=f"Ticket {i}", description=f"Description {i}")
             await service.create_ticket(ticket_data)
 
         tickets = await service.get_tickets()

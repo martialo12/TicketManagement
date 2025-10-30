@@ -4,7 +4,7 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "B", "Q"]
-ignore = []
+ignore = ["B008"]  # Allow function calls in argument defaults (FastAPI pattern)
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
